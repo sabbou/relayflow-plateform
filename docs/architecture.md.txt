@@ -1,0 +1,9 @@
+# Architecture – RelayFlow
+
+## Objectif
+Décrire l’architecture technique du projet RelayFlow.
+
+## À venir
+- Diagramme global
+- Choix techniques
+- Découpage backend / frontend
