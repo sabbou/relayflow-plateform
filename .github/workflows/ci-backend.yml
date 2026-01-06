@@ -28,6 +28,4 @@ jobs:
 
       - name: Run tests
         working-directory: backend
-        run: |
-          chmod +x mvnw
-          ./mvnw test
+        run: mvn -B test
