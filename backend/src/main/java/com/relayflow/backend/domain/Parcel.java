@@ -42,5 +42,13 @@ public class Parcel {
 
     public Instant getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+    public static Parcel create(String reference) {
+        Parcel p = new Parcel();
+        p.reference = reference;           // si tu peux (sinon via setter)
+        p.status = ParcelStatus.CREATED;
+        p.createdAt = Instant.now();
+        p.updatedAt = Instant.now();
+        return p;
+    }
 }
 
