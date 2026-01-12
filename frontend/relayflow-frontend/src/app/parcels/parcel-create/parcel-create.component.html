@@ -1,0 +1,28 @@
+<div style="max-width: 520px; margin: 24px auto; padding: 16px;">
+      <h2>Créer un colis</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <label for="reference">Référence</label><br />
+        <input id="reference" type="text" formControlName="reference" />
+
+        <div *ngIf="referenceCtrl.touched && referenceCtrl.invalid" style="margin-top: 8px;">
+          <small *ngIf="referenceCtrl.errors?.['required']">La référence est obligatoire.</small><br />
+          <small *ngIf="referenceCtrl.errors?.['maxlength']">Max 50 caractères.</small>
+        </div>
+
+        <button type="submit" [disabled]="isLoading" style="margin-top: 12px;">
+          {{ isLoading ? 'Création...' : 'Créer' }}
+        </button>
+      </form>
+
+      <div *ngIf="created" style="margin-top: 16px;">
+        <h3>✅ Colis créé</h3>
+        <p><b>ID:</b> {{ created.id }}</p>
+        <p><b>Référence:</b> {{ created.reference }}</p>
+        <p><b>Status:</b> {{ created.status }}</p>
+      </div>
+
+      <div *ngIf="errorMessage" style="margin-top: 16px;">
+        <p style="color: red;"><b>Erreur:</b> {{ errorMessage }}</p>
+      </div>
+    </div>
