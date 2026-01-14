@@ -1,11 +1,11 @@
 
 export type ParcelStatus ='CREATED' |'IN_TRANSIT' | 'ARRIVED_AT_RELAY' | 'DELIVERED'
 export interface Parcel {
-    id : String ;
-    reference : String ;
+    id : string;
+    reference : string ;
     status  :ParcelStatus;
-    createdAt? : String ;
-    updateAt? : String;
+    createdAt : string ;
+    updateAt : string;
 }
 export interface createParcelRequet {
 reference : string ;

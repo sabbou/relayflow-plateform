@@ -16,10 +16,18 @@ public class ParcelService {
     public ParcelService(ParcelRepository parcelRepository) {
         this.parcelRepository = parcelRepository;
     }
-    public ParcelResponse getById(UUID id) {
+
+
+
+    /*public ParcelResponse getById(UUID id) {
         Parcel parcel = parcelRepository.findById(id).orElseThrow(()-> new ParcelNotFoundException(id));
         return toResponse(parcel);
+    }*/
+     public ParcelResponse getByReference(String reference) {
+        Parcel parcel = parcelRepository.findByReference(reference).orElseThrow(()-> new ParcelNotFoundException(reference));
+        return toResponse(parcel);
     }
+
 
     public ParcelResponse create(CreateParcelRequest parcelRequest)
     {

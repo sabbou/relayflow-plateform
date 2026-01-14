@@ -12,4 +12,7 @@ constructor(private http :HttpClient) {
 create (req:createParcelRequet) : Observable<Parcel> {
     return this.http.post<Parcel>(this.baseUrl , req);
 }
+getByReference(reference :String) :Observable<Parcel> {
+    return this.http.get<Parcel>(this.baseUrl+`/by-reference/${reference}`)
+}
 }
