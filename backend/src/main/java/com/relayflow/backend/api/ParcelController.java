@@ -25,9 +25,15 @@ public class ParcelController {
     public ParcelResponse createParcel(@RequestBody @Valid  CreateParcelRequest req) {
         return parcelService.create(req);
     }
-    @GetMapping("/{id}")
-    public ParcelResponse getParcelById(@PathVariable UUID id) {
-        return parcelService.getById(id);
+//    @GetMapping("/{id}")
+//    public ParcelResponse getParcelById(@PathVariable UUID id) {
+//        return parcelService.getById(id);
+//    }
+
+    @GetMapping("/by-reference/{reference}")
+    public ParcelResponse getParcelByReference(@PathVariable String reference) {
+
+        return parcelService.getByReference(reference);
     }
 
 }

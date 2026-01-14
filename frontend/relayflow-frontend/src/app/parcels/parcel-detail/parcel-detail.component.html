@@ -1,0 +1,26 @@
+<div style="max-width: 520px; margin: 40px auto; padding: 16px;">
+  <a routerLink="/parcels/new">← Retour</a>
+
+  <h2 style="margin-top: 16px;">Détail colis</h2>
+
+  <ng-container *ngIf="vm$ | async as vm; else loading">
+    <div *ngIf="vm.state === 'notfound'">
+      <p>Colis introuvable.</p>
+    </div>
+
+    <div *ngIf="vm.state === 'error'">
+      <p style="color: #b00020;">{{ vm.message }}</p>
+    </div>
+
+    <div *ngIf="vm.state === 'ready'">
+      <p><b>Référence :</b> {{ vm.parcel.reference }}</p>
+      <p><b>Statut :</b> {{ vm.parcel.status }}</p>
+      <p><b>Créé le :</b> {{ vm.parcel.createdAt | date:'medium' }}</p>
+      <p><b>Mis à jour le :</b> {{ vm.parcel.updateAt | date:'medium' }}</p>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <p>Chargement...</p>
+  </ng-template>
+</div>
