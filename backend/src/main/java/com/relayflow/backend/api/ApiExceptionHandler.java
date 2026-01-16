@@ -1,6 +1,7 @@
 package com.relayflow.backend.api;
 
 import com.relayflow.backend.service.DuplicateReferenceException;
+import com.relayflow.backend.service.InvalidStatusTransitionException;
 import com.relayflow.backend.service.ParcelNotFoundException;
 import org.springframework.beans.factory.parsing.Problem;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,8 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -22,5 +25,10 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ProblemDetail conflict(DuplicateReferenceException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+    }
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInvalidStatus(InvalidStatusTransitionException ex) {
+        return Map.of("error", ex.getMessage());
     }
 }

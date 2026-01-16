@@ -1,5 +1,6 @@
 package com.relayflow.backend.domain;
 
+import com.relayflow.backend.service.InvalidStatusTransitionException;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -49,6 +50,25 @@ public class Parcel {
         p.createdAt = Instant.now();
         p.updatedAt = Instant.now();
         return p;
+    }
+    public void changeStatus (ParcelStatus newStatus) {
+        if(this.status==ParcelStatus.DELIVERED) {
+            throw new InvalidStatusTransitionException(this.status, newStatus);
+        }
+      if(!isNextStatus(newStatus)) {
+          throw new InvalidStatusTransitionException(this.status, newStatus);
+      }
+      this.status = newStatus;
+      this.updatedAt = Instant.now();
+    }
+    private boolean isNextStatus(ParcelStatus newStatus) {
+        return switch (this.status){
+            case CREATED -> newStatus.equals(ParcelStatus.IN_TRANSIT);
+            case IN_TRANSIT -> newStatus.equals(ParcelStatus.ARRIVED_AT_RELAY);
+            case ARRIVED_AT_RELAY -> newStatus.equals(ParcelStatus.DELIVERED);
+            case DELIVERED -> false;
+
+        };
     }
 }
 
