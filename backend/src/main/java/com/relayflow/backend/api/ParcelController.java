@@ -3,6 +3,7 @@ package com.relayflow.backend.api;
 
 import com.relayflow.backend.api.dto.CreateParcelRequest;
 import com.relayflow.backend.api.dto.ParcelResponse;
+import com.relayflow.backend.api.dto.UpdateParcelStatusRequest;
 import com.relayflow.backend.domain.Parcel;
 import com.relayflow.backend.repository.ParcelRepository;
 import com.relayflow.backend.service.ParcelService;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class ParcelController {
     private final ParcelService parcelService;
     public ParcelController(ParcelService parcelService) {
+
         this.parcelService = parcelService;
     }
     @PostMapping
@@ -35,5 +37,12 @@ public class ParcelController {
 
         return parcelService.getByReference(reference);
     }
+    @PatchMapping("/{reference}/status")
+    public ParcelResponse updateStatus(
+            @PathVariable String reference,
+            @RequestBody UpdateParcelStatusRequest request
+    ) {
+        return parcelService.changeStatus(reference, request.status());
 
+    }
 }

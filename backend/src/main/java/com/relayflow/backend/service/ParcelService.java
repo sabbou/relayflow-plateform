@@ -3,6 +3,7 @@ package com.relayflow.backend.service;
 import com.relayflow.backend.api.dto.CreateParcelRequest;
 import com.relayflow.backend.api.dto.ParcelResponse;
 import com.relayflow.backend.domain.Parcel;
+import com.relayflow.backend.domain.ParcelStatus;
 import com.relayflow.backend.repository.ParcelRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +18,7 @@ public class ParcelService {
         this.parcelRepository = parcelRepository;
     }
 
-
-
-    /*public ParcelResponse getById(UUID id) {
+ /*public ParcelResponse getById(UUID id) {
         Parcel parcel = parcelRepository.findById(id).orElseThrow(()-> new ParcelNotFoundException(id));
         return toResponse(parcel);
     }*/
@@ -51,5 +50,12 @@ public class ParcelService {
 
 
     }
-
+@Transactional
+public ParcelResponse changeStatus(String reference, ParcelStatus status)
+{
+    Parcel parcel = parcelRepository.findByReference(reference).orElseThrow(()-> new ParcelNotFoundException(reference));
+    parcel.changeStatus(status);
+   // return parcelRepository.save(parcel); hibernate va flusher tout seul parce qu'on a @transactional
+    return toResponse(parcel) ;
+}
 }
