@@ -5,7 +5,7 @@ export interface Parcel {
     reference : string ;
     status  :ParcelStatus;
     createdAt : string ;
-    updateAt : string;
+    updatedAt : string;
 }
 export interface createParcelRequet {
 reference : string ;
