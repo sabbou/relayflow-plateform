@@ -22,7 +22,8 @@ export class ParcelDetailComponent {
 private route =inject(ActivatedRoute);
 private parcelService = inject(ParcelService);
 private updating$ = new BehaviorSubject<boolean>(false); //état de mise à jour
-private updateError$ = new BehaviorSubject <String | null >(null);//erreur éventuelle
+private updateError$ = new BehaviorSubject <string | null >(null);//erreur éventuelle
+private refresh$ = new BehaviorSubject<void>(undefined);//on ajoute un refresh$ qui force le rechargement sans reloader toute la page.
 //le choix de behaviviorsubject
 // behaviviorsubject parce que ça devient réactif qui peut être observée , émettre des nouvelles
 //  valeurs ou bien garder la dernière  valeur courante (si on choisit subject : le subject n'a pas de valeur initiale mais behaviorsubject a tujours une valeur acttuelle)
@@ -59,7 +60,9 @@ return of<ViewState>({state :'error', message : 'erreur lors du chargement du co
 );
 }),
 );*/
-private parcel$ =this.reference$.pipe(switchMap(reference=>{
+
+private parcel$ = combineLatest([this.reference$, this.refresh$]).pipe(
+  switchMap(([reference]) => {
   if(!reference) return of<ViewState>({state : 'error' , message : 'reference manquante dans l URL'});
 return this.parcelService.getByReference(reference).pipe(
   map(parcel=>({state : 'ready' , parcel , isUpdating :false} as ViewState)),
@@ -76,7 +79,7 @@ vm$= combineLatest([this.parcel$ ,this.updating$ , this.updateError$ ]).pipe(map
   return { ...vm , isUpdating, updateError :updateError ?? undefined} as ViewState ;
 }
 )) ;
-nextAction(status : ParcelStatus) : {label : String ; next : ParcelStatus} | null {
+nextAction(status : ParcelStatus) : {label : string ; next : ParcelStatus} | null {
   switch(status){
     case 'CREATED' :
       return {label : 'Expédier' , next : 'IN_TRANSIT'};
@@ -89,15 +92,16 @@ nextAction(status : ParcelStatus) : {label : String ; next : ParcelStatus} | nul
   }
 }
 updateStatus (reference : string , next : ParcelStatus){
-  this.updateError$.next(null);
-  this.updating$.next(true);
-  this.parcelService.updateStatus (reference , next).subscribe({
+  this.updateError$.next(null);// reset ancien message
+  this.updating$.next(true);// ✅ loading patch
+  //ancien sans refrech
+  /*this.parcelService.updateStatus (reference , next).subscribe({
     //// petit hack simple : on force un reload via navigation ou on peut mieux faire avec refresh stream
         // Ici : on recharge la page en relançant le fetch (re-souscription) en resetant updating.
         next: () => {
           this.updating$.next(false);
-          // Pour refléter immédiatement sans complexifier, tu peux aussi faire un "soft reload" :
-        // => le plus simple est de rafraîchir en rechargant la route (si tu veux je te donne la version propre).
+          
+        // => le plus simple est de rafraîchir en rechargant la route 
         location.reload();
         },
         error: (err)=> {
@@ -111,7 +115,30 @@ updateStatus (reference : string , next : ParcelStatus){
             this.updateError$.next('Erreur lors de la mise à jour du statut');
           }
         }
+  });*/
+  this.parcelService.updateStatus(reference, next).pipe(
+    map(() => null),
+    catchError(err => {
+      this.updateError$.next(this.extractApiErrorMessage(err)); // 400/404/500
+      return of(null);
+    })
+  ).subscribe(() => {
+    this.updating$.next(false);
+    this.refresh$.next(); // ✅ recharge le colis (sans reload page)
   });
+}
+private extractApiErrorMessage(err: any): string {
+  // Backend Spring ProblemDetail -> err.error.detail
+  const apiMsg =
+    err?.error?.detail ||
+    err?.error?.error ||   // si jamais tu renvoies {error:"..."}
+    err?.error?.message || // autre format
+    null;
+
+  if (err?.status === 400) return apiMsg ?? 'Transition invalide';
+  if (err?.status === 404) return 'Colis introuvable';
+  if (err?.status >= 500) return 'Erreur serveur';
+  return apiMsg ?? 'Erreur lors de la mise à jour du statut';
 }
 }
 

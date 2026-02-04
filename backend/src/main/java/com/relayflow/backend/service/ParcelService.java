@@ -35,7 +35,7 @@ public class ParcelService {
             throw new DuplicateReferenceException(ref);
         }
         Parcel parcel = Parcel.create(ref);
-        parcel.setReference(ref);
+        //parcel.setReference(ref);//Évite le double. Si Parcel.create(ref) met déjà la référence, je ne dois pas faire setReference(ref) après.
        Parcel savedParcel=  parcelRepository.save(parcel);
         return toResponse(savedParcel);
     }
