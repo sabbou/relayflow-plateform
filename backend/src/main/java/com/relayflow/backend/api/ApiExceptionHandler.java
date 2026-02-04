@@ -26,9 +26,24 @@ public class ApiExceptionHandler {
     public ProblemDetail conflict(DuplicateReferenceException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
+
+//    @ExceptionHandler(InvalidStatusTransitionException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ProblemDetail handleInvalidStatus(InvalidStatusTransitionException ex) {
+//        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+//    }
     @ExceptionHandler(InvalidStatusTransitionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleInvalidStatus(InvalidStatusTransitionException ex) {
-        return Map.of("error", ex.getMessage());
+    public ProblemDetail handleInvalidStatus(InvalidStatusTransitionException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        pd.setTitle("Invalid parcel status transition");
+        pd.setProperty("code", "PARCEL_INVALID_TRANSITION");
+        pd.setProperty("from", ex.getFrom());
+        pd.setProperty("to", ex.getTo());
+        return pd;
     }
+    //Ça donne au front :
+    //detail : message lisible
+    //code : stable pour gérer l’affichage
+    //from/to : debug / UI éventuelle
 }
